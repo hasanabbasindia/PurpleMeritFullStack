@@ -18,17 +18,19 @@ export async function GET() {
     if (csvFile) {
       const filePath = path.join(datasetPath, csvFile)
       
-      return new Promise<NextResponse>((resolve) => {
+      const data = await new Promise<any[]>((resolve, reject) => {
+        const csvResults: any[] = []
         fs.createReadStream(filePath)
           .pipe(csv())
-          .on('data', (data) => results.push(data))
-          .on('end', () => {
-            resolve(NextResponse.json({ 
-              data: results.slice(0, 100),
-              filename: csvFile,
-              total: results.length 
-            }))
-          })
+          .on('data', (data) => csvResults.push(data))
+          .on('end', () => resolve(csvResults))
+          .on('error', (error) => reject(error))
+      })
+      
+      return NextResponse.json({ 
+        data: data.slice(0, 100),
+        filename: csvFile,
+        total: data.length 
       })
     }
     
