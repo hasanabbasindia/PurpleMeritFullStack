@@ -18,7 +18,7 @@ export async function GET() {
     if (csvFile) {
       const filePath = path.join(datasetPath, csvFile)
       
-      return new Promise((resolve) => {
+      return new Promise<NextResponse>((resolve) => {
         fs.createReadStream(filePath)
           .pipe(csv())
           .on('data', (data) => results.push(data))
